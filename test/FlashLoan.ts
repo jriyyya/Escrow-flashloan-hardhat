@@ -8,8 +8,9 @@ const ether = tokens;
 describe("FlashLoan", () => {
   let accounts;
   let deployer;
-  let token;
-  let flashLoan;
+  let token: any;
+  let flashLoan: any;
+
   beforeEach(async () => {
     //Setup accounts
     accounts = await ethers.getSigners();
@@ -27,10 +28,25 @@ describe("FlashLoan", () => {
 
     // Deploy Flash Loan Pool
     flashLoan = await FlashLoan.deploy(token.address);
+
+    // Approve the token
+    let transaction = await token
+      .connect(deployer)
+      .approve(flashLoan.address, tokens(1000000));
+    await transaction.wait();
+
+    // DXeposit tokens into the pool
+    transaction = await flashLoan
+      .connect(deployer)
+      .depositTokens(tokens(1000000));
+    await transaction.wait();
   });
+
   describe("Deployment", () => {
-    it("works", () => {
-      expect(1 + 1).to.equal(2);
+    it("works", async () => {
+      expect(await token.balanceOf(flashLoan.address)).to.equal(
+        tokens(1000000)
+      );
     });
   });
 });

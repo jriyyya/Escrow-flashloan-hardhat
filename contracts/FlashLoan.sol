@@ -9,4 +9,8 @@ contract FlashLoan {
     constructor(address _tokenAddress) {
         token = Token(_tokenAddress);
     }
+
+    function depositTokens(uint256 _amount) external {
+        token.transferFrom(msg.sender, address(this), _amount);
+    }
 }
